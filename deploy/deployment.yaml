@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubermanager
+  namespace: platform
+  labels:
+    app: kubermanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubermanager
+  template:
+    metadata:
+      labels:
+        app: kubermanager
+    spec:
+      serviceAccountName: kubermanager-sa
+      containers:
+        - name: kubermanager
+          image: your-registry/kubermanager:latest
+          ports:
+            - containerPort: 5001
+              name: grpc
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: Kubernetes__UseInClusterConfig
+              value: "true"
+            - name: Policy__AllowedNamespaces__0
+              value: "app-prod"
+            - name: Policy__AllowedNamespaces__1
+              value: "app-stage"
+            - name: Policy__MaxReplicas
+              value: "20"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+      securityContext:
+        fsGroup: 2000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubermanager
+  namespace: platform
+  labels:
+    app: kubermanager
+spec:
+  type: ClusterIP
+  selector:
+    app: kubermanager
+  ports:
+    - name: grpc
+      port: 5001
+      targetPort: 5001
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kubermanager-netpol
+  namespace: platform
+spec:
+  podSelector:
+    matchLabels:
+      app: kubermanager
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: api
+      ports:
+        - protocol: TCP
+          port: 5001

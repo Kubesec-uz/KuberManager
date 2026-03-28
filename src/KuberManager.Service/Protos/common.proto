@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+message OperationReply {
+  bool success = 1;
+  string message = 2;
+  string correlation_id = 3;
+}

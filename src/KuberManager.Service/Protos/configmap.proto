@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service ConfigMapService {
+  rpc List (ListConfigMapsRequest) returns (ConfigMapListReply);
+  rpc Get (ConfigMapRef) returns (ConfigMapReply);
+  rpc Create (CreateConfigMapRequest) returns (OperationReply);
+  rpc Update (UpdateConfigMapRequest) returns (OperationReply);
+  rpc Delete (DeleteConfigMapRequest) returns (OperationReply);
+}
+
+message ConfigMapRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListConfigMapsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message CreateConfigMapRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  map<string, string> data = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}
+
+message UpdateConfigMapRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  map<string, string> data = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}
+
+message DeleteConfigMapRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message ConfigMapReply {
+  string name = 1;
+  string namespace = 2;
+  map<string, string> data = 3;
+  string created_at = 4;
+}
+
+message ConfigMapListReply {
+  repeated ConfigMapReply configmaps = 1;
+}

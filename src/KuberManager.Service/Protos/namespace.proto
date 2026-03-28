@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service NamespaceService {
+  rpc List (ListNamespacesRequest) returns (NamespaceListReply);
+  rpc Get (NamespaceRef) returns (NamespaceInfoReply);
+  rpc Create (CreateNamespaceRequest) returns (OperationReply);
+  rpc Delete (DeleteNamespaceRequest) returns (OperationReply);
+}
+
+message NamespaceRef {
+  string cluster = 1;
+  string name = 2;
+}
+
+message ListNamespacesRequest {
+  string cluster = 1;
+}
+
+message CreateNamespaceRequest {
+  string cluster = 1;
+  string name = 2;
+  map<string, string> labels = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message DeleteNamespaceRequest {
+  string cluster = 1;
+  string name = 2;
+  string requested_by = 3;
+  string reason = 4;
+  string correlation_id = 5;
+}
+
+message NamespaceInfoReply {
+  string name = 1;
+  string status = 2;
+  string created_at = 3;
+  map<string, string> labels = 4;
+}
+
+message NamespaceListReply {
+  repeated NamespaceInfoReply namespaces = 1;
+}

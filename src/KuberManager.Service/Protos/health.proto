@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service ClusterHealthService {
+  rpc Ping (PingRequest) returns (PingReply);
+  rpc ClusterHealth (ClusterHealthRequest) returns (ClusterHealthReply);
+  rpc CanAccessNamespace (NamespaceAccessRequest) returns (NamespaceAccessReply);
+}
+
+message PingRequest {}
+
+message PingReply {
+  string status = 1;
+  string version = 2;
+}
+
+message ClusterHealthRequest {
+  string cluster = 1;
+}
+
+message ClusterHealthReply {
+  string cluster = 1;
+  bool reachable = 2;
+  string server_version = 3;
+  string message = 4;
+}
+
+message NamespaceAccessRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message NamespaceAccessReply {
+  bool can_access = 1;
+  string message = 2;
+}

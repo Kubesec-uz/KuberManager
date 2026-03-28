@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service DeploymentService {
+  rpc GetStatus (DeploymentRef) returns (DeploymentStatusReply);
+  rpc Scale (ScaleDeploymentRequest) returns (OperationReply);
+  rpc Restart (RestartDeploymentRequest) returns (OperationReply);
+  rpc List (ListDeploymentsRequest) returns (DeploymentListReply);
+  rpc Create (CreateDeploymentRequest) returns (OperationReply);
+  rpc Delete (DeleteDeploymentRequest) returns (OperationReply);
+}
+
+message DeploymentRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message CreateDeploymentRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string image = 4;
+  int32 replicas = 5;
+  map<string, string> labels = 6;
+  map<string, string> env_vars = 7;
+  repeated ContainerPort ports = 8;
+  string requested_by = 9;
+  string reason = 10;
+  string correlation_id = 11;
+}
+
+message ContainerPort {
+  string name = 1;
+  int32 container_port = 2;
+  string protocol = 3;
+}
+
+message DeleteDeploymentRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message ScaleDeploymentRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  int32 replicas = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}
+
+message RestartDeploymentRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message ListDeploymentsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message DeploymentStatusReply {
+  string name = 1;
+  string namespace = 2;
+  int32 desired_replicas = 3;
+  int32 ready_replicas = 4;
+  int32 available_replicas = 5;
+  string strategy = 6;
+  string status = 7;
+}
+
+message DeploymentListReply {
+  repeated DeploymentStatusReply deployments = 1;
+}
