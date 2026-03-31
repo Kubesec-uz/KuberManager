@@ -8,16 +8,16 @@ namespace KuberManager.Service.Grpc;
 
 public sealed class ClusterHealthGrpcService : ClusterHealthService.ClusterHealthServiceBase
 {
-    private readonly IKubernetesFacade _k8s;
+    private readonly IKubernetesFacadeFactory _k8sFactory;
     private readonly PolicyOptions _policy;
     private readonly ILogger<ClusterHealthGrpcService> _logger;
 
     public ClusterHealthGrpcService(
-        IKubernetesFacade k8s,
+        IKubernetesFacadeFactory k8sFactory,
         IOptions<PolicyOptions> policy,
         ILogger<ClusterHealthGrpcService> logger)
     {
-        _k8s = k8s;
+        _k8sFactory = k8sFactory;
         _policy = policy.Value;
         _logger = logger;
     }
@@ -31,7 +31,7 @@ public sealed class ClusterHealthGrpcService : ClusterHealthService.ClusterHealt
     {
         try
         {
-            var version = await _k8s.GetServerVersionAsync(context.CancellationToken);
+            var version = await _k8sFactory.For(request.Cluster).GetServerVersionAsync(context.CancellationToken);
             return new ClusterHealthReply
             {
                 Cluster = request.Cluster,

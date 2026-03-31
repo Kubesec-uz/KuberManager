@@ -1,6 +1,7 @@
 using k8s;
 using k8s.Models;
 using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 
 namespace KuberManager.Service.Infrastructure.Kubernetes;
 
@@ -127,11 +128,17 @@ public sealed class KubernetesFacade : IKubernetesFacade
         using var stdoutStream = demux.GetStream(ChannelIndex.StdOut, null);
         using var stderrStream = demux.GetStream(ChannelIndex.StdErr, null);
 
-        var stdoutTask = ReadStreamAsync(stdoutStream, false, ct);
-        var stderrTask = ReadStreamAsync(stderrStream, true, ct);
+        var channel = Channel.CreateUnbounded<(string output, bool isStderr)>();
 
-        await foreach (var item in MergeAsync(stdoutTask, stderrTask, ct))
+        var stdoutTask = ReadStreamToChannelAsync(stdoutStream, false, channel.Writer, ct);
+        var stderrTask = ReadStreamToChannelAsync(stderrStream, true, channel.Writer, ct);
+
+        _ = Task.WhenAll(stdoutTask, stderrTask).ContinueWith(_ => channel.Writer.TryComplete(), CancellationToken.None);
+
+        await foreach (var item in channel.Reader.ReadAllAsync(ct))
+        {
             yield return item;
+        }
     }
 
     // ── Namespaces ─────────────────────────────────────────────────────────────
@@ -204,24 +211,22 @@ public sealed class KubernetesFacade : IKubernetesFacade
 
     // ── Private helpers ────────────────────────────────────────────────────────
 
-    private static async Task<List<(string output, bool isStderr)>> ReadStreamAsync(
-        Stream stream, bool isStderr, CancellationToken ct)
+    private static async Task ReadStreamToChannelAsync(
+        Stream stream, bool isStderr, ChannelWriter<(string output, bool isStderr)> writer, CancellationToken ct)
     {
-        var results = new List<(string, bool)>();
-        using var reader = new StreamReader(stream);
-        string? line;
-        while ((line = await reader.ReadLineAsync(ct)) is not null)
-            results.Add((line, isStderr));
-        return results;
-    }
-
-    private static async IAsyncEnumerable<(string output, bool isStderr)> MergeAsync(
-        Task<List<(string, bool)>> stdoutTask,
-        Task<List<(string, bool)>> stderrTask,
-        [EnumeratorCancellation] CancellationToken ct)
-    {
-        await Task.WhenAll(stdoutTask, stderrTask);
-        foreach (var item in stdoutTask.Result.Concat(stderrTask.Result))
-            yield return item;
+        try
+        {
+            using var reader = new StreamReader(stream);
+            string? line;
+            while ((line = await reader.ReadLineAsync(ct)) is not null)
+            {
+                await writer.WriteAsync((line, isStderr), ct);
+            }
+        }
+        catch (OperationCanceledException) { /* Ignored */ }
+        catch (Exception ex)
+        {
+            writer.TryComplete(ex);
+        }
     }
 }

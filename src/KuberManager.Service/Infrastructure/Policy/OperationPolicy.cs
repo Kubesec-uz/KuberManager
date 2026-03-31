@@ -16,7 +16,7 @@ public sealed class OperationPolicy : IOperationPolicy
 
     public void EnsureNamespaceAllowed(string ns)
     {
-        if (_options.AllowedNamespaces.Count > 0 && !_options.AllowedNamespaces.Contains(ns))
+        if (_options.AllowedNamespaces.Count == 0 || !_options.AllowedNamespaces.Contains(ns))
         {
             _logger.LogWarning("Access denied to namespace {Namespace}", ns);
             throw new PolicyViolationException($"Access to namespace '{ns}' is not allowed.");

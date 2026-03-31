@@ -122,7 +122,7 @@ Domain/
 ```csharp
 // Infrastructure
 builder.Services.AddSingleton<IKubernetesClientFactory, KubernetesClientFactory>();
-builder.Services.AddScoped<IKubernetesFacade, KubernetesFacade>();
+builder.Services.AddSingleton<IKubernetesFacadeFactory, KubernetesFacadeFactory>();
 builder.Services.AddSingleton<IOperationPolicy, OperationPolicy>();
 builder.Services.AddSingleton<IAuditService, LogAuditService>();
 
@@ -144,5 +144,5 @@ builder.Services.AddGrpcHealthChecks();
 | `KubernetesClientFactory` | Singleton | Cluster client lar cached, bir marta yaratiladi |
 | `OperationPolicy` | Singleton | Config dan o'qiladi, o'zgarmaydi |
 | `AuditService` | Singleton | Stateless logger wrapper |
-| `KubernetesFacade` | Scoped | Har so'rov uchun yangi instance, factory dan client oladi |
-| `*Manager` | Scoped | Facade bilan birgalikda ishlaydi |
+| `KubernetesFacadeFactory` | Singleton | Turli xil logikalar uchun facade yaratuvchi factory (har bir klaster bo'yicha) |
+| `*Manager` | Scoped | FacadeFactory yordamida `IKubernetesFacade` yaratib, k8s bilan ishlaydi |

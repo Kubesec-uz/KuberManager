@@ -16,22 +16,29 @@ public sealed class LogAuditService : IAuditService
 
     public Task RecordAsync(AuditEntry entry, CancellationToken ct = default)
     {
-        _logger.LogInformation(
-            "[AUDIT] Id={Id} CorrelationId={CorrelationId} RequestedBy={RequestedBy} " +
-            "Action={Action} Cluster={Cluster} Namespace={Namespace} " +
-            "ResourceType={ResourceType} ResourceName={ResourceName} " +
-            "Reason={Reason} Success={Success} Error={ErrorMessage}",
-            entry.Id,
-            entry.CorrelationId,
-            entry.RequestedBy,
-            entry.Action,
-            entry.Cluster,
-            entry.Namespace,
-            entry.ResourceType,
-            entry.ResourceName,
-            entry.Reason,
-            entry.Success,
-            entry.ErrorMessage);
+        try
+        {
+            _logger.LogInformation(
+                "[AUDIT] Id={Id} CorrelationId={CorrelationId} RequestedBy={RequestedBy} " +
+                "Action={Action} Cluster={Cluster} Namespace={Namespace} " +
+                "ResourceType={ResourceType} ResourceName={ResourceName} " +
+                "Reason={Reason} Success={Success} Error={ErrorMessage}",
+                entry.Id,
+                entry.CorrelationId,
+                entry.RequestedBy,
+                entry.Action,
+                entry.Cluster,
+                entry.Namespace,
+                entry.ResourceType,
+                entry.ResourceName,
+                entry.Reason,
+                entry.Success,
+                entry.ErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to record audit entry for correlation ID {CorrelationId}", entry.CorrelationId);
+        }
 
         return Task.CompletedTask;
     }

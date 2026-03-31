@@ -28,7 +28,7 @@ try
 
     // Infrastructure
     builder.Services.AddSingleton<IKubernetesClientFactory, KubernetesClientFactory>();
-    builder.Services.AddScoped<IKubernetesFacade, KubernetesFacade>();
+    builder.Services.AddSingleton<IKubernetesFacadeFactory, KubernetesFacadeFactory>();
     builder.Services.AddSingleton<IOperationPolicy, OperationPolicy>();
     builder.Services.AddSingleton<IAuditService, LogAuditService>();
 

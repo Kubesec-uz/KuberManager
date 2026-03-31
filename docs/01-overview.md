@@ -78,7 +78,7 @@ Brauzer / Mobil ilova
    → OperationPolicy.EnsureNamespaceAllowed("production")
    → OperationPolicy.EnsureDeploymentAllowed("production", "api-server")
    → OperationPolicy.EnsureReplicaLimit(5)
-   → KubernetesFacade.PatchDeploymentReplicasAsync
+   → KubernetesFacadeFactory.For(cluster).PatchDeploymentReplicasAsync
    → k8s API: PATCH /apis/apps/v1/namespaces/production/deployments/api-server/scale
    → AuditService.RecordAsync(action: "ScaleDeployment", success: true)
 

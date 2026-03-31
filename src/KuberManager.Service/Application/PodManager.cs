@@ -8,18 +8,18 @@ namespace KuberManager.Service.Application;
 
 public sealed class PodManager : IPodManager
 {
-    private readonly IKubernetesFacade _k8s;
+    private readonly IKubernetesFacadeFactory _k8sFactory;
     private readonly IOperationPolicy _policy;
     private readonly IAuditService _audit;
     private readonly ILogger<PodManager> _logger;
 
     public PodManager(
-        IKubernetesFacade k8s,
+        IKubernetesFacadeFactory k8sFactory,
         IOperationPolicy policy,
         IAuditService audit,
         ILogger<PodManager> logger)
     {
-        _k8s = k8s;
+        _k8sFactory = k8sFactory;
         _policy = policy;
         _audit = audit;
         _logger = logger;
@@ -29,21 +29,21 @@ public sealed class PodManager : IPodManager
     {
         _policy.EnsureNamespaceAllowed(ns);
         var labelSelector = appLabel is not null ? $"app={appLabel}" : null;
-        var pods = await _k8s.ListPodsAsync(ns, labelSelector, ct);
+        var pods = await _k8sFactory.For(cluster).ListPodsAsync(ns, labelSelector, ct);
         return pods.Select(MapToDto).ToList();
     }
 
     public async Task<PodInfoDto> GetAsync(string cluster, string ns, string podName, CancellationToken ct = default)
     {
         _policy.EnsureNamespaceAllowed(ns);
-        var pod = await _k8s.GetPodAsync(ns, podName, ct);
+        var pod = await _k8sFactory.For(cluster).GetPodAsync(ns, podName, ct);
         return MapToDto(pod);
     }
 
     public async Task<string> GetLogsAsync(string cluster, string ns, string podName, string? container = null, int? tailLines = null, CancellationToken ct = default)
     {
         _policy.EnsureNamespaceAllowed(ns);
-        return await _k8s.GetPodLogsAsync(ns, podName, container, tailLines, ct);
+        return await _k8sFactory.For(cluster).GetPodLogsAsync(ns, podName, container, tailLines, ct);
     }
 
     public async Task<OperationResult> DeleteAsync(
@@ -59,7 +59,7 @@ public sealed class PodManager : IPodManager
 
         try
         {
-            await _k8s.DeletePodAsync(ns, podName, ct);
+            await _k8sFactory.For(cluster).DeletePodAsync(ns, podName, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = correlationId,
@@ -116,7 +116,7 @@ public sealed class PodManager : IPodManager
             Success = true
         }, ct);
 
-        await foreach (var item in _k8s.ExecInPodAsync(ns, podName, container, command, ct))
+        await foreach (var item in _k8sFactory.For(cluster).ExecInPodAsync(ns, podName, container, command, ct))
             yield return item;
     }
 

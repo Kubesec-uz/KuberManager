@@ -22,7 +22,7 @@
   "Policy": {
     "AllowedNamespaces": [],
     "BlockedDeployments": [],
-    "MaxReplicas": 50
+    "MaxReplicas": 20
   }
 }
 ```

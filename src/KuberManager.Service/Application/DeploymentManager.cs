@@ -9,18 +9,18 @@ namespace KuberManager.Service.Application;
 
 public sealed class DeploymentManager : IDeploymentManager
 {
-    private readonly IKubernetesFacade _k8s;
+    private readonly IKubernetesFacadeFactory _k8sFactory;
     private readonly IOperationPolicy _policy;
     private readonly IAuditService _audit;
     private readonly ILogger<DeploymentManager> _logger;
 
     public DeploymentManager(
-        IKubernetesFacade k8s,
+        IKubernetesFacadeFactory k8sFactory,
         IOperationPolicy policy,
         IAuditService audit,
         ILogger<DeploymentManager> logger)
     {
-        _k8s = k8s;
+        _k8sFactory = k8sFactory;
         _policy = policy;
         _audit = audit;
         _logger = logger;
@@ -29,14 +29,14 @@ public sealed class DeploymentManager : IDeploymentManager
     public async Task<DeploymentStatusDto> GetStatusAsync(string cluster, string ns, string name, CancellationToken ct = default)
     {
         _policy.EnsureNamespaceAllowed(ns);
-        var deployment = await _k8s.GetDeploymentAsync(ns, name, ct);
+        var deployment = await _k8sFactory.For(cluster).GetDeploymentAsync(ns, name, ct);
         return MapToDto(deployment);
     }
 
     public async Task<IReadOnlyList<DeploymentStatusDto>> ListAsync(string cluster, string ns, CancellationToken ct = default)
     {
         _policy.EnsureNamespaceAllowed(ns);
-        var deployments = await _k8s.ListDeploymentsAsync(ns, ct);
+        var deployments = await _k8sFactory.For(cluster).ListDeploymentsAsync(ns, ct);
         return deployments.Select(MapToDto).ToList();
     }
 
@@ -55,7 +55,7 @@ public sealed class DeploymentManager : IDeploymentManager
 
         try
         {
-            await _k8s.PatchDeploymentReplicasAsync(ns, name, replicas, ct);
+            await _k8sFactory.For(cluster).PatchDeploymentReplicasAsync(ns, name, replicas, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = correlationId,
@@ -104,7 +104,7 @@ public sealed class DeploymentManager : IDeploymentManager
 
         try
         {
-            await _k8s.PatchDeploymentRestartAsync(ns, name, DateTimeOffset.UtcNow, ct);
+            await _k8sFactory.For(cluster).PatchDeploymentRestartAsync(ns, name, DateTimeOffset.UtcNow, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = correlationId,
@@ -182,7 +182,7 @@ public sealed class DeploymentManager : IDeploymentManager
                 }
             };
 
-            await _k8s.CreateDeploymentAsync(ns, deployment, ct);
+            await _k8sFactory.For(cluster).CreateDeploymentAsync(ns, deployment, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = dto.CorrelationId,
@@ -227,7 +227,7 @@ public sealed class DeploymentManager : IDeploymentManager
 
         try
         {
-            await _k8s.DeleteDeploymentAsync(ns, name, ct);
+            await _k8sFactory.For(cluster).DeleteDeploymentAsync(ns, name, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = correlationId,

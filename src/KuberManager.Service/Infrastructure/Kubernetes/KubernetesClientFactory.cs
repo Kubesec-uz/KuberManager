@@ -40,13 +40,19 @@ public sealed class KubernetesClientFactory : IKubernetesClientFactory
             return KubernetesClientConfiguration.InClusterConfig();
         }
 
-        if (_options.Clusters.TryGetValue(clusterName, out var kubeconfigPath) && !string.IsNullOrEmpty(kubeconfigPath))
+        if (!_options.Clusters.TryGetValue(clusterName, out var kubeconfigPath))
         {
-            _logger.LogInformation("Using kubeconfig at {Path} for cluster {Cluster}", kubeconfigPath, clusterName);
-            return KubernetesClientConfiguration.BuildConfigFromConfigFile(kubeconfigPath);
+            _logger.LogError("Configuration for cluster '{Cluster}' not found", clusterName);
+            throw new ArgumentException($"Configuration for cluster '{clusterName}' is missing.");
         }
 
-        _logger.LogInformation("Using default kubeconfig for cluster {Cluster}", clusterName);
-        return KubernetesClientConfiguration.BuildDefaultConfig();
+        if (string.IsNullOrEmpty(kubeconfigPath))
+        {
+            _logger.LogInformation("Using default kubeconfig for cluster {Cluster}", clusterName);
+            return KubernetesClientConfiguration.BuildDefaultConfig();
+        }
+
+        _logger.LogInformation("Using kubeconfig at {Path} for cluster {Cluster}", kubeconfigPath, clusterName);
+        return KubernetesClientConfiguration.BuildConfigFromConfigFile(kubeconfigPath);
     }
 }

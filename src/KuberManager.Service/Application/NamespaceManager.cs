@@ -8,26 +8,26 @@ namespace KuberManager.Service.Application;
 
 public sealed class NamespaceManager : INamespaceManager
 {
-    private readonly IKubernetesFacade _k8s;
+    private readonly IKubernetesFacadeFactory _k8sFactory;
     private readonly IAuditService _audit;
     private readonly ILogger<NamespaceManager> _logger;
 
-    public NamespaceManager(IKubernetesFacade k8s, IAuditService audit, ILogger<NamespaceManager> logger)
+    public NamespaceManager(IKubernetesFacadeFactory k8sFactory, IAuditService audit, ILogger<NamespaceManager> logger)
     {
-        _k8s = k8s;
+        _k8sFactory = k8sFactory;
         _audit = audit;
         _logger = logger;
     }
 
     public async Task<IReadOnlyList<NamespaceInfoDto>> ListAsync(string cluster, CancellationToken ct = default)
     {
-        var namespaces = await _k8s.ListNamespacesAsync(ct);
+        var namespaces = await _k8sFactory.For(cluster).ListNamespacesAsync(ct);
         return namespaces.Select(MapToDto).ToList();
     }
 
     public async Task<NamespaceInfoDto> GetAsync(string cluster, string name, CancellationToken ct = default)
     {
-        var ns = await _k8s.GetNamespaceAsync(name, ct);
+        var ns = await _k8sFactory.For(cluster).GetNamespaceAsync(name, ct);
         return MapToDto(ns);
     }
 
@@ -40,7 +40,7 @@ public sealed class NamespaceManager : INamespaceManager
             {
                 Metadata = new V1ObjectMeta { Name = name, Labels = labels }
             };
-            await _k8s.CreateNamespaceAsync(ns, ct);
+            await _k8sFactory.For(cluster).CreateNamespaceAsync(ns, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = correlationId, RequestedBy = requestedBy,
@@ -69,7 +69,7 @@ public sealed class NamespaceManager : INamespaceManager
         _logger.LogInformation("Deleting namespace {Name} by {RequestedBy} [{CorrelationId}]", name, requestedBy, correlationId);
         try
         {
-            await _k8s.DeleteNamespaceAsync(name, ct);
+            await _k8sFactory.For(cluster).DeleteNamespaceAsync(name, ct);
             await _audit.RecordAsync(new AuditEntry
             {
                 CorrelationId = correlationId, RequestedBy = requestedBy,
