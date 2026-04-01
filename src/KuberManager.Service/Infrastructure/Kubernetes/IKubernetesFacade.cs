@@ -101,4 +101,40 @@ public interface IKubernetesFacade
     Task<V2HorizontalPodAutoscaler> GetHpaAsync(string ns, string name, CancellationToken ct = default);
     Task<V2HorizontalPodAutoscaler> CreateHpaAsync(string ns, V2HorizontalPodAutoscaler hpa, CancellationToken ct = default);
     Task DeleteHpaAsync(string ns, string name, CancellationToken ct = default);
+
+    // ServiceAccounts
+    Task<IReadOnlyList<V1ServiceAccount>> ListServiceAccountsAsync(string ns, CancellationToken ct = default);
+    Task<V1ServiceAccount> GetServiceAccountAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1ServiceAccount> CreateServiceAccountAsync(string ns, V1ServiceAccount sa, CancellationToken ct = default);
+    Task DeleteServiceAccountAsync(string ns, string name, CancellationToken ct = default);
+
+    // RBAC – Roles
+    Task<IReadOnlyList<V1Role>> ListRolesAsync(string ns, CancellationToken ct = default);
+    Task<V1Role> GetRoleAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1Role> CreateRoleAsync(string ns, V1Role role, CancellationToken ct = default);
+    Task DeleteRoleAsync(string ns, string name, CancellationToken ct = default);
+
+    // RBAC – ClusterRoles
+    Task<IReadOnlyList<V1ClusterRole>> ListClusterRolesAsync(CancellationToken ct = default);
+    Task<V1ClusterRole> GetClusterRoleAsync(string name, CancellationToken ct = default);
+    Task<V1ClusterRole> CreateClusterRoleAsync(V1ClusterRole clusterRole, CancellationToken ct = default);
+    Task DeleteClusterRoleAsync(string name, CancellationToken ct = default);
+
+    // RBAC – RoleBindings
+    Task<IReadOnlyList<V1RoleBinding>> ListRoleBindingsAsync(string ns, CancellationToken ct = default);
+    Task<V1RoleBinding> GetRoleBindingAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1RoleBinding> CreateRoleBindingAsync(string ns, V1RoleBinding binding, CancellationToken ct = default);
+    Task DeleteRoleBindingAsync(string ns, string name, CancellationToken ct = default);
+
+    // RBAC – ClusterRoleBindings
+    Task<IReadOnlyList<V1ClusterRoleBinding>> ListClusterRoleBindingsAsync(CancellationToken ct = default);
+    Task<V1ClusterRoleBinding> GetClusterRoleBindingAsync(string name, CancellationToken ct = default);
+    Task<V1ClusterRoleBinding> CreateClusterRoleBindingAsync(V1ClusterRoleBinding binding, CancellationToken ct = default);
+    Task DeleteClusterRoleBindingAsync(string name, CancellationToken ct = default);
+
+    // NetworkPolicies
+    Task<IReadOnlyList<V1NetworkPolicy>> ListNetworkPoliciesAsync(string ns, CancellationToken ct = default);
+    Task<V1NetworkPolicy> GetNetworkPolicyAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1NetworkPolicy> CreateNetworkPolicyAsync(string ns, V1NetworkPolicy policy, CancellationToken ct = default);
+    Task DeleteNetworkPolicyAsync(string ns, string name, CancellationToken ct = default);
 }

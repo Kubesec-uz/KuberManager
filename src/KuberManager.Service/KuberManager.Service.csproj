@@ -22,6 +22,9 @@
     <Protobuf Include="Protos\node.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\pvc.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\hpa.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\serviceaccount.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\rbac.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\networkpolicy.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

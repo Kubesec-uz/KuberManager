@@ -1,0 +1,219 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+// ──── Role & ClusterRole ────────────────────────────────────────────────────
+
+service RbacService {
+  // Roles (namespaced)
+  rpc ListRoles (ListRolesRequest) returns (RoleListReply);
+  rpc GetRole (RoleRef) returns (RoleReply);
+  rpc CreateRole (CreateRoleRequest) returns (OperationReply);
+  rpc DeleteRole (DeleteRoleRequest) returns (OperationReply);
+
+  // ClusterRoles (cluster-wide)
+  rpc ListClusterRoles (ListClusterRolesRequest) returns (ClusterRoleListReply);
+  rpc GetClusterRole (ClusterRoleRef) returns (ClusterRoleReply);
+  rpc CreateClusterRole (CreateClusterRoleRequest) returns (OperationReply);
+  rpc DeleteClusterRole (DeleteClusterRoleRequest) returns (OperationReply);
+
+  // RoleBindings (namespaced)
+  rpc ListRoleBindings (ListRoleBindingsRequest) returns (RoleBindingListReply);
+  rpc GetRoleBinding (RoleBindingRef) returns (RoleBindingReply);
+  rpc CreateRoleBinding (CreateRoleBindingRequest) returns (OperationReply);
+  rpc DeleteRoleBinding (DeleteRoleBindingRequest) returns (OperationReply);
+
+  // ClusterRoleBindings (cluster-wide)
+  rpc ListClusterRoleBindings (ListClusterRoleBindingsRequest) returns (ClusterRoleBindingListReply);
+  rpc GetClusterRoleBinding (ClusterRoleBindingRef) returns (ClusterRoleBindingReply);
+  rpc CreateClusterRoleBinding (CreateClusterRoleBindingRequest) returns (OperationReply);
+  rpc DeleteClusterRoleBinding (DeleteClusterRoleBindingRequest) returns (OperationReply);
+}
+
+// ─── Shared types ───────────────────────────────────────────────────────────
+
+message PolicyRule {
+  repeated string api_groups = 1;
+  repeated string resources = 2;
+  repeated string verbs = 3;
+  repeated string resource_names = 4;
+}
+
+message Subject {
+  string kind = 1;   // User, Group, ServiceAccount
+  string name = 2;
+  string namespace = 3;
+  string api_group = 4;
+}
+
+// ─── Role ───────────────────────────────────────────────────────────────────
+
+message RoleRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListRolesRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message RoleReply {
+  string name = 1;
+  string namespace = 2;
+  repeated PolicyRule rules = 3;
+  string created_at = 4;
+}
+
+message RoleListReply {
+  repeated RoleReply items = 1;
+}
+
+message CreateRoleRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  repeated PolicyRule rules = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}
+
+message DeleteRoleRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+// ─── ClusterRole ────────────────────────────────────────────────────────────
+
+message ClusterRoleRef {
+  string cluster = 1;
+  string name = 2;
+}
+
+message ListClusterRolesRequest {
+  string cluster = 1;
+}
+
+message ClusterRoleReply {
+  string name = 1;
+  repeated PolicyRule rules = 2;
+  string created_at = 3;
+}
+
+message ClusterRoleListReply {
+  repeated ClusterRoleReply items = 1;
+}
+
+message CreateClusterRoleRequest {
+  string cluster = 1;
+  string name = 2;
+  repeated PolicyRule rules = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message DeleteClusterRoleRequest {
+  string cluster = 1;
+  string name = 2;
+  string requested_by = 3;
+  string reason = 4;
+  string correlation_id = 5;
+}
+
+// ─── RoleBinding ────────────────────────────────────────────────────────────
+
+message RoleBindingRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListRoleBindingsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message RoleBindingReply {
+  string name = 1;
+  string namespace = 2;
+  string role_kind = 3;
+  string role_name = 4;
+  repeated Subject subjects = 5;
+  string created_at = 6;
+}
+
+message RoleBindingListReply {
+  repeated RoleBindingReply items = 1;
+}
+
+message CreateRoleBindingRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string role_kind = 4;  // Role or ClusterRole
+  string role_name = 5;
+  repeated Subject subjects = 6;
+  string requested_by = 7;
+  string reason = 8;
+  string correlation_id = 9;
+}
+
+message DeleteRoleBindingRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+// ─── ClusterRoleBinding ─────────────────────────────────────────────────────
+
+message ClusterRoleBindingRef {
+  string cluster = 1;
+  string name = 2;
+}
+
+message ListClusterRoleBindingsRequest {
+  string cluster = 1;
+}
+
+message ClusterRoleBindingReply {
+  string name = 1;
+  string role_name = 2;
+  repeated Subject subjects = 3;
+  string created_at = 4;
+}
+
+message ClusterRoleBindingListReply {
+  repeated ClusterRoleBindingReply items = 1;
+}
+
+message CreateClusterRoleBindingRequest {
+  string cluster = 1;
+  string name = 2;
+  string role_name = 3;
+  repeated Subject subjects = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}
+
+message DeleteClusterRoleBindingRequest {
+  string cluster = 1;
+  string name = 2;
+  string requested_by = 3;
+  string reason = 4;
+  string correlation_id = 5;
+}

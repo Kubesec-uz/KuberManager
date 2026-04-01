@@ -49,6 +49,10 @@ try
     builder.Services.AddScoped<INodeManager, NodeManager>();
     builder.Services.AddScoped<IPvcManager, PvcManager>();
     builder.Services.AddScoped<IHpaManager, HpaManager>();
+    // Security
+    builder.Services.AddScoped<IServiceAccountManager, ServiceAccountManager>();
+    builder.Services.AddScoped<IRbacManager, RbacManager>();
+    builder.Services.AddScoped<INetworkPolicyManager, NetworkPolicyManager>();
 
     // gRPC
     builder.Services.AddGrpc(options =>
@@ -77,6 +81,10 @@ try
     app.MapGrpcService<NodeGrpcService>();
     app.MapGrpcService<PvcGrpcService>();
     app.MapGrpcService<HpaGrpcService>();
+    // Security
+    app.MapGrpcService<ServiceAccountGrpcService>();
+    app.MapGrpcService<RbacGrpcService>();
+    app.MapGrpcService<NetworkPolicyGrpcService>();
     app.MapGrpcService<ClusterHealthGrpcService>();
     app.MapGrpcHealthChecksService();
     app.MapHealthChecks("/healthz");

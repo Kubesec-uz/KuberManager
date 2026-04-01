@@ -549,6 +549,168 @@ public sealed class KubernetesFacade : IKubernetesFacade
         await _client.AutoscalingV2.DeleteNamespacedHorizontalPodAutoscalerAsync(name, ns, cancellationToken: ct);
     }
 
+    // ── ServiceAccounts ───────────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<V1ServiceAccount>> ListServiceAccountsAsync(string ns, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Listing serviceaccounts in {Namespace}", ns);
+        var list = await _client.CoreV1.ListNamespacedServiceAccountAsync(ns, cancellationToken: ct);
+        return (IReadOnlyList<V1ServiceAccount>)list.Items;
+    }
+
+    public async Task<V1ServiceAccount> GetServiceAccountAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Getting serviceaccount {Namespace}/{Name}", ns, name);
+        return await _client.CoreV1.ReadNamespacedServiceAccountAsync(name, ns, cancellationToken: ct);
+    }
+
+    public async Task<V1ServiceAccount> CreateServiceAccountAsync(string ns, V1ServiceAccount sa, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Creating serviceaccount {Namespace}/{Name}", ns, sa.Metadata.Name);
+        return await _client.CoreV1.CreateNamespacedServiceAccountAsync(sa, ns, cancellationToken: ct);
+    }
+
+    public async Task DeleteServiceAccountAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Deleting serviceaccount {Namespace}/{Name}", ns, name);
+        await _client.CoreV1.DeleteNamespacedServiceAccountAsync(name, ns, cancellationToken: ct);
+    }
+
+    // ── RBAC – Roles ──────────────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<V1Role>> ListRolesAsync(string ns, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Listing roles in {Namespace}", ns);
+        var list = await _client.RbacAuthorizationV1.ListNamespacedRoleAsync(ns, cancellationToken: ct);
+        return (IReadOnlyList<V1Role>)list.Items;
+    }
+
+    public async Task<V1Role> GetRoleAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Getting role {Namespace}/{Name}", ns, name);
+        return await _client.RbacAuthorizationV1.ReadNamespacedRoleAsync(name, ns, cancellationToken: ct);
+    }
+
+    public async Task<V1Role> CreateRoleAsync(string ns, V1Role role, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Creating role {Namespace}/{Name}", ns, role.Metadata.Name);
+        return await _client.RbacAuthorizationV1.CreateNamespacedRoleAsync(role, ns, cancellationToken: ct);
+    }
+
+    public async Task DeleteRoleAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Deleting role {Namespace}/{Name}", ns, name);
+        await _client.RbacAuthorizationV1.DeleteNamespacedRoleAsync(name, ns, cancellationToken: ct);
+    }
+
+    // ── RBAC – ClusterRoles ───────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<V1ClusterRole>> ListClusterRolesAsync(CancellationToken ct = default)
+    {
+        _logger.LogDebug("Listing clusterroles");
+        var list = await _client.RbacAuthorizationV1.ListClusterRoleAsync(cancellationToken: ct);
+        return (IReadOnlyList<V1ClusterRole>)list.Items;
+    }
+
+    public async Task<V1ClusterRole> GetClusterRoleAsync(string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Getting clusterrole {Name}", name);
+        return await _client.RbacAuthorizationV1.ReadClusterRoleAsync(name, cancellationToken: ct);
+    }
+
+    public async Task<V1ClusterRole> CreateClusterRoleAsync(V1ClusterRole clusterRole, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Creating clusterrole {Name}", clusterRole.Metadata.Name);
+        return await _client.RbacAuthorizationV1.CreateClusterRoleAsync(clusterRole, cancellationToken: ct);
+    }
+
+    public async Task DeleteClusterRoleAsync(string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Deleting clusterrole {Name}", name);
+        await _client.RbacAuthorizationV1.DeleteClusterRoleAsync(name, cancellationToken: ct);
+    }
+
+    // ── RBAC – RoleBindings ───────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<V1RoleBinding>> ListRoleBindingsAsync(string ns, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Listing rolebindings in {Namespace}", ns);
+        var list = await _client.RbacAuthorizationV1.ListNamespacedRoleBindingAsync(ns, cancellationToken: ct);
+        return (IReadOnlyList<V1RoleBinding>)list.Items;
+    }
+
+    public async Task<V1RoleBinding> GetRoleBindingAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Getting rolebinding {Namespace}/{Name}", ns, name);
+        return await _client.RbacAuthorizationV1.ReadNamespacedRoleBindingAsync(name, ns, cancellationToken: ct);
+    }
+
+    public async Task<V1RoleBinding> CreateRoleBindingAsync(string ns, V1RoleBinding binding, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Creating rolebinding {Namespace}/{Name}", ns, binding.Metadata.Name);
+        return await _client.RbacAuthorizationV1.CreateNamespacedRoleBindingAsync(binding, ns, cancellationToken: ct);
+    }
+
+    public async Task DeleteRoleBindingAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Deleting rolebinding {Namespace}/{Name}", ns, name);
+        await _client.RbacAuthorizationV1.DeleteNamespacedRoleBindingAsync(name, ns, cancellationToken: ct);
+    }
+
+    // ── RBAC – ClusterRoleBindings ────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<V1ClusterRoleBinding>> ListClusterRoleBindingsAsync(CancellationToken ct = default)
+    {
+        _logger.LogDebug("Listing clusterrolebindings");
+        var list = await _client.RbacAuthorizationV1.ListClusterRoleBindingAsync(cancellationToken: ct);
+        return (IReadOnlyList<V1ClusterRoleBinding>)list.Items;
+    }
+
+    public async Task<V1ClusterRoleBinding> GetClusterRoleBindingAsync(string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Getting clusterrolebinding {Name}", name);
+        return await _client.RbacAuthorizationV1.ReadClusterRoleBindingAsync(name, cancellationToken: ct);
+    }
+
+    public async Task<V1ClusterRoleBinding> CreateClusterRoleBindingAsync(V1ClusterRoleBinding binding, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Creating clusterrolebinding {Name}", binding.Metadata.Name);
+        return await _client.RbacAuthorizationV1.CreateClusterRoleBindingAsync(binding, cancellationToken: ct);
+    }
+
+    public async Task DeleteClusterRoleBindingAsync(string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Deleting clusterrolebinding {Name}", name);
+        await _client.RbacAuthorizationV1.DeleteClusterRoleBindingAsync(name, cancellationToken: ct);
+    }
+
+    // ── NetworkPolicies ───────────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<V1NetworkPolicy>> ListNetworkPoliciesAsync(string ns, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Listing networkpolicies in {Namespace}", ns);
+        var list = await _client.NetworkingV1.ListNamespacedNetworkPolicyAsync(ns, cancellationToken: ct);
+        return (IReadOnlyList<V1NetworkPolicy>)list.Items;
+    }
+
+    public async Task<V1NetworkPolicy> GetNetworkPolicyAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Getting networkpolicy {Namespace}/{Name}", ns, name);
+        return await _client.NetworkingV1.ReadNamespacedNetworkPolicyAsync(name, ns, cancellationToken: ct);
+    }
+
+    public async Task<V1NetworkPolicy> CreateNetworkPolicyAsync(string ns, V1NetworkPolicy policy, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Creating networkpolicy {Namespace}/{Name}", ns, policy.Metadata.Name);
+        return await _client.NetworkingV1.CreateNamespacedNetworkPolicyAsync(policy, ns, cancellationToken: ct);
+    }
+
+    public async Task DeleteNetworkPolicyAsync(string ns, string name, CancellationToken ct = default)
+    {
+        _logger.LogDebug("Deleting networkpolicy {Namespace}/{Name}", ns, name);
+        await _client.NetworkingV1.DeleteNamespacedNetworkPolicyAsync(name, ns, cancellationToken: ct);
+    }
+
     // ── Private helpers ────────────────────────────────────────────────────────
 
     private static async Task ReadStreamToChannelAsync(

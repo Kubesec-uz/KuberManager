@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+// ──── NetworkPolicy ─────────────────────────────────────────────────────────
+
+service NetworkPolicyService {
+  rpc List (ListNetworkPoliciesRequest) returns (NetworkPolicyListReply);
+  rpc Get (NetworkPolicyRef) returns (NetworkPolicyReply);
+  rpc Create (CreateNetworkPolicyRequest) returns (OperationReply);
+  rpc Delete (DeleteNetworkPolicyRequest) returns (OperationReply);
+}
+
+message NetworkPolicyRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListNetworkPoliciesRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message NetworkPolicyReply {
+  string name = 1;
+  string namespace = 2;
+  repeated string pod_selector_labels = 3;
+  repeated string policy_types = 4;  // Ingress, Egress
+  string created_at = 5;
+}
+
+message NetworkPolicyListReply {
+  repeated NetworkPolicyReply items = 1;
+}
+
+// Simplified create - allows denying all ingress/egress for a pod selector
+message CreateNetworkPolicyRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  map<string, string> pod_selector = 4;
+  repeated string policy_types = 5;     // ["Ingress"], ["Egress"], ["Ingress","Egress"]
+  bool deny_all_ingress = 6;
+  bool deny_all_egress = 7;
+  repeated NetworkPolicyPeer allow_ingress_from = 8;
+  repeated NetworkPolicyPeer allow_egress_to = 9;
+  string requested_by = 10;
+  string reason = 11;
+  string correlation_id = 12;
+}
+
+message NetworkPolicyPeer {
+  map<string, string> namespace_selector = 1;
+  map<string, string> pod_selector = 2;
+  string ip_block = 3;                   // e.g. "10.0.0.0/8"
+}
+
+message DeleteNetworkPolicyRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
