@@ -1,29 +1,6 @@
-using k8s.Models;
-using KuberManager.Service.Domain;
-using KuberManager.Service.Infrastructure.Audit;
-using KuberManager.Service.Infrastructure.Kubernetes;
-using KuberManager.Service.Infrastructure.Policy;
-
 namespace KuberManager.Service.Application.DTOs;
 
-public class ServiceAccountDto
-{
-    public string Name { get; set; } = string.Empty;
-    public string Namespace { get; set; } = string.Empty;
-    public List<string> Secrets { get; set; } = new();
-    public string CreatedAt { get; set; } = string.Empty;
-}
-
-public class CreateServiceAccountDto
-{
-    public string Cluster { get; set; } = string.Empty;
-    public string Namespace { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public Dictionary<string, string> Annotations { get; set; } = new();
-    public string RequestedBy { get; set; } = string.Empty;
-    public string Reason { get; set; } = string.Empty;
-    public string CorrelationId { get; set; } = string.Empty;
-}
+// ─── Shared ──────────────────────────────────────────────────────────────────
 
 public class PolicyRuleDto
 {
@@ -40,6 +17,8 @@ public class SubjectDto
     public string Namespace { get; set; } = string.Empty;
     public string ApiGroup { get; set; } = string.Empty;
 }
+
+// ─── Role ────────────────────────────────────────────────────────────────────
 
 public class RoleDto
 {
@@ -60,6 +39,8 @@ public class CreateRoleDto
     public string CorrelationId { get; set; } = string.Empty;
 }
 
+// ─── ClusterRole ─────────────────────────────────────────────────────────────
+
 public class ClusterRoleDto
 {
     public string Name { get; set; } = string.Empty;
@@ -76,6 +57,8 @@ public class CreateClusterRoleDto
     public string Reason { get; set; } = string.Empty;
     public string CorrelationId { get; set; } = string.Empty;
 }
+
+// ─── RoleBinding ─────────────────────────────────────────────────────────────
 
 public class RoleBindingDto
 {
@@ -100,6 +83,8 @@ public class CreateRoleBindingDto
     public string CorrelationId { get; set; } = string.Empty;
 }
 
+// ─── ClusterRoleBinding ───────────────────────────────────────────────────────
+
 public class ClusterRoleBindingDto
 {
     public string Name { get; set; } = string.Empty;
@@ -114,38 +99,6 @@ public class CreateClusterRoleBindingDto
     public string Name { get; set; } = string.Empty;
     public string RoleName { get; set; } = string.Empty;
     public List<SubjectDto> Subjects { get; set; } = new();
-    public string RequestedBy { get; set; } = string.Empty;
-    public string Reason { get; set; } = string.Empty;
-    public string CorrelationId { get; set; } = string.Empty;
-}
-
-public class NetworkPolicyDto
-{
-    public string Name { get; set; } = string.Empty;
-    public string Namespace { get; set; } = string.Empty;
-    public List<string> PodSelectorLabels { get; set; } = new();
-    public List<string> PolicyTypes { get; set; } = new();
-    public string CreatedAt { get; set; } = string.Empty;
-}
-
-public class NetworkPolicyPeerDto
-{
-    public Dictionary<string, string> NamespaceSelector { get; set; } = new();
-    public Dictionary<string, string> PodSelector { get; set; } = new();
-    public string IpBlock { get; set; } = string.Empty;
-}
-
-public class CreateNetworkPolicyDto
-{
-    public string Cluster { get; set; } = string.Empty;
-    public string Namespace { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public Dictionary<string, string> PodSelector { get; set; } = new();
-    public List<string> PolicyTypes { get; set; } = new();
-    public bool DenyAllIngress { get; set; }
-    public bool DenyAllEgress { get; set; }
-    public List<NetworkPolicyPeerDto> AllowIngressFrom { get; set; } = new();
-    public List<NetworkPolicyPeerDto> AllowEgressTo { get; set; } = new();
     public string RequestedBy { get; set; } = string.Empty;
     public string Reason { get; set; } = string.Empty;
     public string CorrelationId { get; set; } = string.Empty;
