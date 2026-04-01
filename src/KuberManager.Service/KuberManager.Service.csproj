@@ -13,6 +13,15 @@
     <Protobuf Include="Protos\health.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\namespace.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\configmap.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\service.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\secret.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\ingress.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\statefulset.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\daemonset.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\job.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\node.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\pvc.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\hpa.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

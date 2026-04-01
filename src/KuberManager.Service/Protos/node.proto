@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service NodeService {
+  rpc List (ListNodesRequest) returns (NodeListReply);
+  rpc Get (NodeRef) returns (NodeReply);
+  rpc Cordon (CordonNodeRequest) returns (OperationReply);
+  rpc Uncordon (UncordonNodeRequest) returns (OperationReply);
+  rpc Drain (DrainNodeRequest) returns (OperationReply);
+}
+
+message NodeRef {
+  string cluster = 1;
+  string name = 2;
+}
+
+message ListNodesRequest {
+  string cluster = 1;
+}
+
+message NodeReply {
+  string name = 1;
+  string status = 2;
+  string roles = 3;
+  string os_image = 4;
+  string kernel_version = 5;
+  string container_runtime = 6;
+  string cpu_capacity = 7;
+  string memory_capacity = 8;
+  bool unschedulable = 9;
+  string created_at = 10;
+}
+
+message NodeListReply {
+  repeated NodeReply items = 1;
+}
+
+message CordonNodeRequest {
+  string cluster = 1;
+  string name = 2;
+  string requested_by = 3;
+  string reason = 4;
+  string correlation_id = 5;
+}
+
+message UncordonNodeRequest {
+  string cluster = 1;
+  string name = 2;
+  string requested_by = 3;
+  string reason = 4;
+  string correlation_id = 5;
+}
+
+message DrainNodeRequest {
+  string cluster = 1;
+  string name = 2;
+  bool force = 3;
+  bool ignore_daemonsets = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}

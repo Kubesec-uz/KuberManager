@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service DaemonSetService {
+  rpc Get (DaemonSetRef) returns (DaemonSetReply);
+  rpc List (ListDaemonSetsRequest) returns (DaemonSetListReply);
+  rpc Create (CreateDaemonSetRequest) returns (OperationReply);
+  rpc Delete (DeleteDaemonSetRequest) returns (OperationReply);
+  rpc Restart (RestartDaemonSetRequest) returns (OperationReply);
+}
+
+message DaemonSetRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message DaemonSetReply {
+  string name = 1;
+  string namespace = 2;
+  int32 desired_number_scheduled = 3;
+  int32 current_number_scheduled = 4;
+  int32 number_ready = 5;
+  string status = 6;
+  string created_at = 7;
+}
+
+message DaemonSetListReply {
+  repeated DaemonSetReply items = 1;
+}
+
+message ListDaemonSetsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message CreateDaemonSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string image = 4;
+  map<string, string> labels = 5;
+  map<string, string> env_vars = 6;
+  string requested_by = 7;
+  string reason = 8;
+  string correlation_id = 9;
+}
+
+message DeleteDaemonSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message RestartDaemonSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}

@@ -32,6 +32,73 @@ public interface IKubernetesFacade
     Task<V1ConfigMap> UpdateConfigMapAsync(string ns, string name, V1ConfigMap configMap, CancellationToken ct = default);
     Task DeleteConfigMapAsync(string ns, string name, CancellationToken ct = default);
 
+    // Services
+    Task<IReadOnlyList<V1Service>> ListServicesAsync(string ns, CancellationToken ct = default);
+    Task<V1Service> GetServiceAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1Service> CreateServiceAsync(string ns, V1Service service, CancellationToken ct = default);
+    Task<V1Service> UpdateServiceAsync(string ns, string name, V1Service service, CancellationToken ct = default);
+    Task DeleteServiceAsync(string ns, string name, CancellationToken ct = default);
+
+    // Secrets
+    Task<IReadOnlyList<V1Secret>> ListSecretsAsync(string ns, CancellationToken ct = default);
+    Task<V1Secret> GetSecretAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1Secret> CreateSecretAsync(string ns, V1Secret secret, CancellationToken ct = default);
+    Task<V1Secret> UpdateSecretAsync(string ns, string name, V1Secret secret, CancellationToken ct = default);
+    Task DeleteSecretAsync(string ns, string name, CancellationToken ct = default);
+
+    // Ingresses
+    Task<IReadOnlyList<V1Ingress>> ListIngressesAsync(string ns, CancellationToken ct = default);
+    Task<V1Ingress> GetIngressAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1Ingress> CreateIngressAsync(string ns, V1Ingress ingress, CancellationToken ct = default);
+    Task<V1Ingress> UpdateIngressAsync(string ns, string name, V1Ingress ingress, CancellationToken ct = default);
+    Task DeleteIngressAsync(string ns, string name, CancellationToken ct = default);
+
     // Cluster
     Task<string> GetServerVersionAsync(CancellationToken ct = default);
+
+    // StatefulSets
+    Task<IReadOnlyList<V1StatefulSet>> ListStatefulSetsAsync(string ns, CancellationToken ct = default);
+    Task<V1StatefulSet> GetStatefulSetAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1StatefulSet> CreateStatefulSetAsync(string ns, V1StatefulSet sts, CancellationToken ct = default);
+    Task DeleteStatefulSetAsync(string ns, string name, CancellationToken ct = default);
+    Task PatchStatefulSetReplicasAsync(string ns, string name, int replicas, CancellationToken ct = default);
+    Task PatchStatefulSetRestartAsync(string ns, string name, DateTimeOffset restartedAt, CancellationToken ct = default);
+
+    // DaemonSets
+    Task<IReadOnlyList<V1DaemonSet>> ListDaemonSetsAsync(string ns, CancellationToken ct = default);
+    Task<V1DaemonSet> GetDaemonSetAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1DaemonSet> CreateDaemonSetAsync(string ns, V1DaemonSet ds, CancellationToken ct = default);
+    Task DeleteDaemonSetAsync(string ns, string name, CancellationToken ct = default);
+    Task PatchDaemonSetRestartAsync(string ns, string name, DateTimeOffset restartedAt, CancellationToken ct = default);
+
+    // Jobs
+    Task<IReadOnlyList<V1Job>> ListJobsAsync(string ns, CancellationToken ct = default);
+    Task<V1Job> GetJobAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1Job> CreateJobAsync(string ns, V1Job job, CancellationToken ct = default);
+    Task DeleteJobAsync(string ns, string name, CancellationToken ct = default);
+
+    // CronJobs
+    Task<IReadOnlyList<V1CronJob>> ListCronJobsAsync(string ns, CancellationToken ct = default);
+    Task<V1CronJob> GetCronJobAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1CronJob> CreateCronJobAsync(string ns, V1CronJob cronJob, CancellationToken ct = default);
+    Task DeleteCronJobAsync(string ns, string name, CancellationToken ct = default);
+    Task PatchCronJobSuspendAsync(string ns, string name, bool suspend, CancellationToken ct = default);
+
+    // Nodes
+    Task<IReadOnlyList<V1Node>> ListNodesAsync(CancellationToken ct = default);
+    Task<V1Node> GetNodeAsync(string name, CancellationToken ct = default);
+    Task PatchNodeUnschedulableAsync(string name, bool unschedulable, CancellationToken ct = default);
+    Task DeletePodsOnNodeAsync(string nodeName, bool force, bool ignoreDaemonSets, CancellationToken ct = default);
+
+    // PersistentVolumeClaims
+    Task<IReadOnlyList<V1PersistentVolumeClaim>> ListPvcsAsync(string ns, CancellationToken ct = default);
+    Task<V1PersistentVolumeClaim> GetPvcAsync(string ns, string name, CancellationToken ct = default);
+    Task<V1PersistentVolumeClaim> CreatePvcAsync(string ns, V1PersistentVolumeClaim pvc, CancellationToken ct = default);
+    Task DeletePvcAsync(string ns, string name, CancellationToken ct = default);
+
+    // HorizontalPodAutoscalers
+    Task<IReadOnlyList<V2HorizontalPodAutoscaler>> ListHpasAsync(string ns, CancellationToken ct = default);
+    Task<V2HorizontalPodAutoscaler> GetHpaAsync(string ns, string name, CancellationToken ct = default);
+    Task<V2HorizontalPodAutoscaler> CreateHpaAsync(string ns, V2HorizontalPodAutoscaler hpa, CancellationToken ct = default);
+    Task DeleteHpaAsync(string ns, string name, CancellationToken ct = default);
 }

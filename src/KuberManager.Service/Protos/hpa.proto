@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service HpaService {
+  rpc List (ListHpasRequest) returns (HpaListReply);
+  rpc Get (HpaRef) returns (HpaReply);
+  rpc Create (CreateHpaRequest) returns (OperationReply);
+  rpc Delete (DeleteHpaRequest) returns (OperationReply);
+}
+
+message HpaRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListHpasRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message HpaReply {
+  string name = 1;
+  string namespace = 2;
+  string target_kind = 3;
+  string target_name = 4;
+  int32 min_replicas = 5;
+  int32 max_replicas = 6;
+  int32 current_replicas = 7;
+  int32 desired_replicas = 8;
+  int32 cpu_target_utilization = 9;
+  string created_at = 10;
+}
+
+message HpaListReply {
+  repeated HpaReply items = 1;
+}
+
+message CreateHpaRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string target_kind = 4;   // Deployment, StatefulSet, etc.
+  string target_name = 5;
+  int32 min_replicas = 6;
+  int32 max_replicas = 7;
+  int32 cpu_target_utilization = 8;
+  string requested_by = 9;
+  string reason = 10;
+  string correlation_id = 11;
+}
+
+message DeleteHpaRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}

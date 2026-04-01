@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service IngressService {
+  rpc Get (IngressRef) returns (IngressReply);
+  rpc List (ListIngressesRequest) returns (IngressListReply);
+  rpc Create (CreateIngressRequest) returns (OperationReply);
+  rpc Delete (DeleteIngressRequest) returns (OperationReply);
+}
+
+message IngressRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListIngressesRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message IngressReply {
+  string name = 1;
+  string namespace = 2;
+  string ingress_class = 3;
+  repeated IngressRuleReply rules = 4;
+  string created_at = 5;
+}
+
+message IngressRuleReply {
+  string host = 1;
+  repeated IngressPathReply paths = 2;
+}
+
+message IngressPathReply {
+  string path = 1;
+  string path_type = 2;
+  string service_name = 3;
+  int32 service_port = 4;
+}
+
+message IngressListReply {
+  repeated IngressReply ingresses = 1;
+}
+
+message CreateIngressRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string ingress_class = 4;
+  repeated IngressRuleRequest rules = 5;
+  string requested_by = 6;
+  string reason = 7;
+  string correlation_id = 8;
+}
+
+message IngressRuleRequest {
+  string host = 1;
+  repeated IngressPathRequest paths = 2;
+}
+
+message IngressPathRequest {
+  string path = 1;
+  string path_type = 2; // Exact, Prefix, ImplementationSpecific
+  string service_name = 3;
+  int32 service_port = 4;
+}
+
+message DeleteIngressRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}

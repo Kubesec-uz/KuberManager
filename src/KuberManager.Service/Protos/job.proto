@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service JobService {
+  rpc Get (JobRef) returns (JobReply);
+  rpc List (ListJobsRequest) returns (JobListReply);
+  rpc Create (CreateJobRequest) returns (OperationReply);
+  rpc Delete (DeleteJobRequest) returns (OperationReply);
+}
+
+service CronJobService {
+  rpc Get (CronJobRef) returns (CronJobReply);
+  rpc List (ListCronJobsRequest) returns (CronJobListReply);
+  rpc Create (CreateCronJobRequest) returns (OperationReply);
+  rpc Delete (DeleteCronJobRequest) returns (OperationReply);
+  rpc Suspend (SuspendCronJobRequest) returns (OperationReply);
+  rpc Resume (ResumeCronJobRequest) returns (OperationReply);
+}
+
+// ──── Job ────
+message JobRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message JobReply {
+  string name = 1;
+  string namespace = 2;
+  int32 completions = 3;
+  int32 succeeded = 4;
+  int32 failed = 5;
+  bool active = 6;
+  string status = 7;
+  string created_at = 8;
+}
+
+message JobListReply {
+  repeated JobReply items = 1;
+}
+
+message ListJobsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message CreateJobRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string image = 4;
+  repeated string command = 5;
+  map<string, string> env_vars = 6;
+  int32 completions = 7;
+  int32 parallelism = 8;
+  string requested_by = 9;
+  string reason = 10;
+  string correlation_id = 11;
+}
+
+message DeleteJobRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+// ──── CronJob ────
+message CronJobRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message CronJobReply {
+  string name = 1;
+  string namespace = 2;
+  string schedule = 3;
+  bool suspended = 4;
+  string last_schedule_time = 5;
+  string status = 6;
+  string created_at = 7;
+}
+
+message CronJobListReply {
+  repeated CronJobReply items = 1;
+}
+
+message ListCronJobsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message CreateCronJobRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string schedule = 4;
+  string image = 5;
+  repeated string command = 6;
+  map<string, string> env_vars = 7;
+  string requested_by = 8;
+  string reason = 9;
+  string correlation_id = 10;
+}
+
+message DeleteCronJobRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message SuspendCronJobRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message ResumeCronJobRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}

@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service ServiceResourceService {
+  rpc Get (ServiceRef) returns (ServiceReply);
+  rpc List (ListServicesRequest) returns (ServiceListReply);
+  rpc Create (CreateServiceRequest) returns (OperationReply);
+  rpc Delete (DeleteServiceRequest) returns (OperationReply);
+}
+
+message ServiceRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message ListServicesRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message ServiceReply {
+  string name = 1;
+  string namespace = 2;
+  string type = 3;
+  string cluster_ip = 4;
+  repeated ServicePort ports = 5;
+  string created_at = 6;
+}
+
+message ServicePort {
+  string name = 1;
+  int32 port = 2;
+  int32 target_port = 3;
+  string protocol = 4;
+  int32 node_port = 5;
+}
+
+message ServiceListReply {
+  repeated ServiceReply services = 1;
+}
+
+message CreateServiceRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string type = 4; // ClusterIP, NodePort, LoadBalancer
+  map<string, string> selector = 5;
+  repeated ServicePort ports = 6;
+  string requested_by = 7;
+  string reason = 8;
+  string correlation_id = 9;
+}
+
+message DeleteServiceRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}

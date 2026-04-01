@@ -37,6 +37,18 @@ try
     builder.Services.AddScoped<IPodManager, PodManager>();
     builder.Services.AddScoped<INamespaceManager, NamespaceManager>();
     builder.Services.AddScoped<IConfigMapManager, ConfigMapManager>();
+    builder.Services.AddScoped<IServiceManager, ServiceManager>();
+    builder.Services.AddScoped<ISecretManager, SecretManager>();
+    builder.Services.AddScoped<IIngressManager, IngressManager>();
+    // Phase 2
+    builder.Services.AddScoped<IStatefulSetManager, StatefulSetManager>();
+    builder.Services.AddScoped<IDaemonSetManager, DaemonSetManager>();
+    builder.Services.AddScoped<IJobManager, JobManager>();
+    builder.Services.AddScoped<ICronJobManager, CronJobManager>();
+    // Phase 3
+    builder.Services.AddScoped<INodeManager, NodeManager>();
+    builder.Services.AddScoped<IPvcManager, PvcManager>();
+    builder.Services.AddScoped<IHpaManager, HpaManager>();
 
     // gRPC
     builder.Services.AddGrpc(options =>
@@ -53,6 +65,18 @@ try
     app.MapGrpcService<PodGrpcService>();
     app.MapGrpcService<NamespaceGrpcService>();
     app.MapGrpcService<ConfigMapGrpcService>();
+    app.MapGrpcService<ServiceGrpcService>();
+    app.MapGrpcService<SecretGrpcService>();
+    app.MapGrpcService<IngressGrpcService>();
+    // Phase 2
+    app.MapGrpcService<StatefulSetGrpcService>();
+    app.MapGrpcService<DaemonSetGrpcService>();
+    app.MapGrpcService<JobGrpcService>();
+    app.MapGrpcService<CronJobGrpcService>();
+    // Phase 3
+    app.MapGrpcService<NodeGrpcService>();
+    app.MapGrpcService<PvcGrpcService>();
+    app.MapGrpcService<HpaGrpcService>();
     app.MapGrpcService<ClusterHealthGrpcService>();
     app.MapGrpcHealthChecksService();
     app.MapHealthChecks("/healthz");

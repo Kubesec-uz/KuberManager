@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+import "Protos/common.proto";
+import "Protos/deployment.proto";
+
+option csharp_namespace = "KuberManager.Contracts";
+
+package kubermanager;
+
+service StatefulSetService {
+  rpc Get (StatefulSetRef) returns (StatefulSetReply);
+  rpc List (ListStatefulSetsRequest) returns (StatefulSetListReply);
+  rpc Create (CreateStatefulSetRequest) returns (OperationReply);
+  rpc Delete (DeleteStatefulSetRequest) returns (OperationReply);
+  rpc Scale (ScaleStatefulSetRequest) returns (OperationReply);
+  rpc Restart (RestartStatefulSetRequest) returns (OperationReply);
+}
+
+message StatefulSetRef {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+}
+
+message StatefulSetReply {
+  string name = 1;
+  string namespace = 2;
+  int32 desired_replicas = 3;
+  int32 ready_replicas = 4;
+  int32 current_replicas = 5;
+  string service_name = 6;
+  string status = 7;
+  string created_at = 8;
+}
+
+message StatefulSetListReply {
+  repeated StatefulSetReply items = 1;
+}
+
+message ListStatefulSetsRequest {
+  string cluster = 1;
+  string namespace = 2;
+}
+
+message CreateStatefulSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string image = 4;
+  int32 replicas = 5;
+  string service_name = 6;
+  map<string, string> labels = 7;
+  map<string, string> env_vars = 8;
+  repeated ContainerPort ports = 9;
+  string requested_by = 10;
+  string reason = 11;
+  string correlation_id = 12;
+}
+
+message DeleteStatefulSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
+
+message ScaleStatefulSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  int32 replicas = 4;
+  string requested_by = 5;
+  string reason = 6;
+  string correlation_id = 7;
+}
+
+message RestartStatefulSetRequest {
+  string cluster = 1;
+  string namespace = 2;
+  string name = 3;
+  string requested_by = 4;
+  string reason = 5;
+  string correlation_id = 6;
+}
