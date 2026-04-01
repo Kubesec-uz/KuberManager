@@ -1,0 +1,11 @@
+global using Xunit;
+global using NSubstitute;
+global using NSubstitute.ExceptionExtensions;
+global using FluentAssertions;
+global using Microsoft.Extensions.Logging;
+global using KuberManager.Service.Application;
+global using KuberManager.Service.Application.DTOs;
+global using KuberManager.Service.Domain;
+global using KuberManager.Service.Infrastructure.Audit;
+global using KuberManager.Service.Infrastructure.Kubernetes;
+global using KuberManager.Service.Infrastructure.Policy;
