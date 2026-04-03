@@ -413,8 +413,8 @@ public sealed class NetworkPolicyManager : INetworkPolicyManager
                 {
                     PodSelector = new V1LabelSelector { MatchLabels = dto.PodSelector.Count > 0 ? dto.PodSelector : null },
                     PolicyTypes = dto.PolicyTypes,
-                    Ingress = ingressRules.Count > 0 ? ingressRules : null,
-                    Egress = egressRules.Count > 0 ? egressRules : null
+                    Ingress = ingressRules,
+                    Egress = egressRules
                 }
             };
 
@@ -446,10 +446,12 @@ public sealed class NetworkPolicyManager : INetworkPolicyManager
         }
     }
 
-    private static List<V1NetworkPolicyIngressRule> BuildIngressRules(CreateNetworkPolicyDto dto)
+    private static List<V1NetworkPolicyIngressRule>? BuildIngressRules(CreateNetworkPolicyDto dto)
     {
+        // DenyAllIngress=true → "Ingress" PolicyType + bo'sh rules list = barcha ingress bloklanadi (k8s semantikasi)
         if (dto.DenyAllIngress) return new List<V1NetworkPolicyIngressRule>();
-        if (dto.AllowIngressFrom.Count == 0) return new List<V1NetworkPolicyIngressRule>();
+        // AllowIngressFrom bo'sh va DenyAll yo'q → Ingress rules null, ya'ni hech qanday cheklov yo'q
+        if (dto.AllowIngressFrom.Count == 0) return null;
 
         return new List<V1NetworkPolicyIngressRule>
         {
@@ -465,10 +467,12 @@ public sealed class NetworkPolicyManager : INetworkPolicyManager
         };
     }
 
-    private static List<V1NetworkPolicyEgressRule> BuildEgressRules(CreateNetworkPolicyDto dto)
+    private static List<V1NetworkPolicyEgressRule>? BuildEgressRules(CreateNetworkPolicyDto dto)
     {
+        // DenyAllEgress=true → "Egress" PolicyType + bo'sh rules list = barcha egress bloklanadi (k8s semantikasi)
         if (dto.DenyAllEgress) return new List<V1NetworkPolicyEgressRule>();
-        if (dto.AllowEgressTo.Count == 0) return new List<V1NetworkPolicyEgressRule>();
+        // AllowEgressTo bo'sh va DenyAll yo'q → Egress rules null, ya'ni hech qanday cheklov yo'q
+        if (dto.AllowEgressTo.Count == 0) return null;
 
         return new List<V1NetworkPolicyEgressRule>
         {

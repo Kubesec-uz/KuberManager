@@ -77,6 +77,20 @@ public class NodeManagerTests
     }
 
     [Fact]
+    public async Task Drain_DeletePodsThrows_UncordonsNode_AndReturnsFailure()
+    {
+        _facade.DeletePodsOnNodeAsync("node-1", Arg.Any<bool>(), Arg.Any<bool>()).Throws(new Exception("eviction denied"));
+
+        var result = await _sut.DrainAsync("prod", "node-1", force: false, ignoreDaemonSets: false, "neo", "evacuate", "corr-n5");
+
+        result.Success.Should().BeFalse();
+        // cordon → pods delete fails → uncordon
+        await _facade.Received(1).PatchNodeUnschedulableAsync("node-1", true);
+        await _facade.Received(1).PatchNodeUnschedulableAsync("node-1", false);
+        await _audit.Received(1).RecordAsync(Arg.Is<AuditEntry>(a => a.Action == "DrainNode" && !a.Success), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Cordon_FacadeThrows_ReturnsFailAndAudits()
     {
         _facade.PatchNodeUnschedulableAsync("node-1", true).Throws(new Exception("forbidden"));

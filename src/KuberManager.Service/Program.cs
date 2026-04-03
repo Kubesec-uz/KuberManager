@@ -1,6 +1,7 @@
 using KuberManager.Service.Application;
 using KuberManager.Service.Grpc;
 using KuberManager.Service.Infrastructure.Audit;
+using KuberManager.Service.Infrastructure.Auth;
 using KuberManager.Service.Infrastructure.Kubernetes;
 using KuberManager.Service.Infrastructure.Options;
 using KuberManager.Service.Infrastructure.Policy;
@@ -25,6 +26,11 @@ try
         builder.Configuration.GetSection(KubernetesOptions.Section));
     builder.Services.Configure<PolicyOptions>(
         builder.Configuration.GetSection(PolicyOptions.Section));
+    builder.Services.Configure<ApiKeyOptions>(
+        builder.Configuration.GetSection(ApiKeyOptions.Section));
+
+    // Auth
+    builder.Services.AddSingleton<ApiKeyInterceptor>();
 
     // Infrastructure
     builder.Services.AddSingleton<IKubernetesClientFactory, KubernetesClientFactory>();
@@ -58,6 +64,7 @@ try
     builder.Services.AddGrpc(options =>
     {
         options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+        options.Interceptors.Add<ApiKeyInterceptor>();
     });
 
     builder.Services.AddGrpcHealthChecks();

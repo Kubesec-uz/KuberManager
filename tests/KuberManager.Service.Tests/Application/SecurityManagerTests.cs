@@ -318,6 +318,50 @@ public class NetworkPolicyManagerTests
     }
 
     [Fact]
+    public async Task Create_NoDenyAll_NoRules_IngressIsNull()
+    {
+        V1NetworkPolicy? captured = null;
+        _facade.CreateNetworkPolicyAsync("default", Arg.Do<V1NetworkPolicy>(np => captured = np))
+               .Returns(K8sModelFactory.NetworkPolicy("empty-policy"));
+
+        var dto = new CreateNetworkPolicyDto
+        {
+            Cluster = "prod", Namespace = "default", Name = "empty-policy",
+            PolicyTypes = new() { "Ingress" },
+            DenyAllIngress = false,
+            // AllowIngressFrom bo'sh → Ingress rules null bo'lishi kerak (k8s da "no restriction")
+            RequestedBy = "neo", Reason = "test", CorrelationId = "corr-np5"
+        };
+
+        await _sut.CreateAsync(dto);
+
+        captured.Should().NotBeNull();
+        captured!.Spec.Ingress.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Create_DenyAllIngress_IngressIsEmptyList()
+    {
+        V1NetworkPolicy? captured = null;
+        _facade.CreateNetworkPolicyAsync("default", Arg.Do<V1NetworkPolicy>(np => captured = np))
+               .Returns(K8sModelFactory.NetworkPolicy("deny-all"));
+
+        var dto = new CreateNetworkPolicyDto
+        {
+            Cluster = "prod", Namespace = "default", Name = "deny-all",
+            PolicyTypes = new() { "Ingress" },
+            DenyAllIngress = true,
+            RequestedBy = "neo", Reason = "isolation", CorrelationId = "corr-np6"
+        };
+
+        await _sut.CreateAsync(dto);
+
+        captured.Should().NotBeNull();
+        // Bo'sh list = k8s deny-all ingress semantikasi
+        captured!.Spec.Ingress.Should().NotBeNull().And.BeEmpty();
+    }
+
+    [Fact]
     public async Task Create_PolicyViolation_Throws()
     {
         _policy.When(p => p.EnsureNamespaceAllowed("kube-system"))

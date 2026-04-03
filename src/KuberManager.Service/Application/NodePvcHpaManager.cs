@@ -80,16 +80,19 @@ public sealed class NodeManager : INodeManager
     public async Task<OperationResult> DrainAsync(string cluster, string name, bool force, bool ignoreDaemonSets, string requestedBy, string reason, string correlationId, CancellationToken ct = default)
     {
         _logger.LogInformation("Draining node {Name}", name);
+        var facade = _k8sFactory.For(cluster);
+        await facade.PatchNodeUnschedulableAsync(name, true, ct);
         try
         {
-            await _k8sFactory.For(cluster).PatchNodeUnschedulableAsync(name, true, ct);
-            await _k8sFactory.For(cluster).DeletePodsOnNodeAsync(name, force, ignoreDaemonSets, ct);
+            await facade.DeletePodsOnNodeAsync(name, force, ignoreDaemonSets, ct);
             await _audit.RecordAsync(new AuditEntry { CorrelationId = correlationId, RequestedBy = requestedBy, Action = "DrainNode", Cluster = cluster, ResourceType = "Node", ResourceName = name, Reason = reason, Success = true }, ct);
             return OperationResult.Ok(correlationId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to drain node {Name}", name);
+            _logger.LogError(ex, "Failed to drain node {Name}, attempting to uncordon", name);
+            try { await facade.PatchNodeUnschedulableAsync(name, false, ct); }
+            catch (Exception uncordonEx) { _logger.LogError(uncordonEx, "Failed to uncordon node {Name} after drain failure — node left cordoned", name); }
             await _audit.RecordAsync(new AuditEntry { CorrelationId = correlationId, RequestedBy = requestedBy, Action = "DrainNode", Cluster = cluster, ResourceType = "Node", ResourceName = name, Reason = reason, Success = false, ErrorMessage = ex.Message }, ct);
             return OperationResult.Fail(correlationId, ex.Message);
         }

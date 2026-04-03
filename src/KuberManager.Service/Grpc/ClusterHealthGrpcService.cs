@@ -55,6 +55,8 @@ public sealed class ClusterHealthGrpcService : ClusterHealthService.ClusterHealt
     public override Task<NamespaceAccessReply> CanAccessNamespace(NamespaceAccessRequest request, ServerCallContext context)
     {
         var allowed = _policy.AllowedNamespaces.Count == 0 || _policy.AllowedNamespaces.Contains(request.Namespace);
+        _logger.LogDebug("CanAccessNamespace: cluster={Cluster}, namespace={Namespace}, allowed={Allowed}",
+            request.Cluster, request.Namespace, allowed);
         return Task.FromResult(new NamespaceAccessReply
         {
             CanAccess = allowed,
