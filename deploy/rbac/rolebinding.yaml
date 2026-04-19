@@ -3,6 +3,8 @@ kind: RoleBinding
 metadata:
   name: kubermanager-rolebinding
   namespace: app-prod
+  labels:
+    app: kubermanager
 subjects:
   - kind: ServiceAccount
     name: kubermanager-sa
@@ -17,6 +19,8 @@ kind: RoleBinding
 metadata:
   name: kubermanager-rolebinding
   namespace: app-stage
+  labels:
+    app: kubermanager
 subjects:
   - kind: ServiceAccount
     name: kubermanager-sa
@@ -25,3 +29,18 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: kubermanager-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubermanager-node-rolebinding
+  labels:
+    app: kubermanager
+subjects:
+  - kind: ServiceAccount
+    name: kubermanager-sa
+    namespace: platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubermanager-node-role
