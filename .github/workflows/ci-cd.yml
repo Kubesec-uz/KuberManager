@@ -46,9 +46,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      image: ${{ steps.meta.outputs.tags }}
-      digest: ${{ steps.push.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
 
@@ -69,7 +66,6 @@ jobs:
             type=raw,value=latest,enable=true
 
       - name: Build and push
-        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
