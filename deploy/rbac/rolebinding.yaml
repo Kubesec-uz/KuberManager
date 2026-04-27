@@ -1,39 +1,11 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: kubermanager-rolebinding
-  namespace: app-prod
-  labels:
-    app: kubermanager
-subjects:
-  - kind: ServiceAccount
-    name: kubermanager-sa
-    namespace: platform
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kubermanager-role
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: kubermanager-rolebinding
-  namespace: app-stage
-  labels:
-    app: kubermanager
-subjects:
-  - kind: ServiceAccount
-    name: kubermanager-sa
-    namespace: platform
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kubermanager-role
----
+# Bitta ClusterRoleBinding — kubermanager-sa ga kubermanager-cluster-role ni bog'laydi
+# Bu barcha namespace'larda ishlashga ruxsat beradi
+# Qo'shimcha xavfsizlik KuberManager'ning o'zidagi AllowedNamespaces policy orqali ta'minlanadi
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kubermanager-node-rolebinding
+  name: kubermanager-cluster-rolebinding
   labels:
     app: kubermanager
 subjects:
@@ -43,4 +15,4 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kubermanager-node-role
+  name: kubermanager-cluster-role

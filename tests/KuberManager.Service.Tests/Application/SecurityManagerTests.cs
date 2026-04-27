@@ -84,6 +84,7 @@ public class RbacManagerTests
 {
     private readonly IKubernetesFacadeFactory _factory = Substitute.For<IKubernetesFacadeFactory>();
     private readonly IKubernetesFacade _facade = Substitute.For<IKubernetesFacade>();
+    private readonly IOperationPolicy _policy = Substitute.For<IOperationPolicy>();
     private readonly IAuditService _audit = Substitute.For<IAuditService>();
     private readonly ILogger<RbacManager> _logger = Substitute.For<ILogger<RbacManager>>();
     private readonly RbacManager _sut;
@@ -91,7 +92,7 @@ public class RbacManagerTests
     public RbacManagerTests()
     {
         _factory.For(Arg.Any<string>()).Returns(_facade);
-        _sut = new RbacManager(_factory, _audit, _logger);
+        _sut = new RbacManager(_factory, _policy, _audit, _logger);
     }
 
     [Fact]

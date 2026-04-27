@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/neo/code/kubesec/kubernets-manager/src"
+    ]
+  }
+}

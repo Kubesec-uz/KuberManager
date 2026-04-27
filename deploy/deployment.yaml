@@ -18,40 +18,47 @@ spec:
       serviceAccountName: kubermanager-sa
       containers:
         - name: kubermanager
-          image: your-registry/kubermanager:latest
+          image: ghcr.io/kubesec-uz/kubermanager:latest
           ports:
             - containerPort: 5001
               name: grpc
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: "Production"
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "5001"
             - name: Kubernetes__UseInClusterConfig
               value: "true"
             - name: Policy__AllowedNamespaces__0
-              value: "app-prod"
+              value: "platform"
             - name: Policy__AllowedNamespaces__1
+              value: "app-prod"
+            - name: Policy__AllowedNamespaces__2
               value: "app-stage"
+            - name: Policy__AllowedNamespaces__3
+              value: "default"
+            - name: Policy__AllowedNamespaces__4
+              value: "kube-system"
             - name: Policy__MaxReplicas
-              value: "20"
+              value: "100"
             - name: ApiKey__Keys__kubesec-auth
               valueFrom:
                 secretKeyRef:
                   name: kubermanager-api-keys
                   key: kubesec-auth
-          # gRPC health check — HTTP/2 only endpoint uchun grpc probe ishlatiladi
-          # grpc probe k8s 1.24+ da mavjud; eski versiyalarda exec + grpc_health_probe binary kerak
-          livenessProbe:
-            grpc:
-              port: 5001
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            failureThreshold: 3
-          readinessProbe:
-            grpc:
-              port: 5001
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            failureThreshold: 3
+          # gRPC health check — k8s 1.24+ uchun grpc probe
+          # livenessProbe:
+          #   grpc:
+          #     port: 5001
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 30
+          #   failureThreshold: 5
+          # readinessProbe:
+          #   grpc:
+          #     port: 5001
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 10
+          #   failureThreshold: 5
           resources:
             requests:
               cpu: "100m"
@@ -82,13 +89,14 @@ metadata:
   labels:
     app: kubermanager
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: kubermanager
   ports:
     - name: grpc
       port: 5001
       targetPort: 5001
+      nodePort: 30501
       protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1

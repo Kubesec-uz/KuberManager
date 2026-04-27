@@ -133,21 +133,29 @@ public sealed class ServiceAccountManager : IServiceAccountManager
 public sealed class RbacManager : IRbacManager
 {
     private readonly IKubernetesFacadeFactory _k8s;
+    private readonly IOperationPolicy _policy;
     private readonly IAuditService _audit;
     private readonly ILogger<RbacManager> _logger;
 
-    public RbacManager(IKubernetesFacadeFactory k8s, IAuditService audit, ILogger<RbacManager> logger)
-    { _k8s = k8s; _audit = audit; _logger = logger; }
+    public RbacManager(IKubernetesFacadeFactory k8s, IOperationPolicy policy, IAuditService audit, ILogger<RbacManager> logger)
+    { _k8s = k8s; _policy = policy; _audit = audit; _logger = logger; }
 
     // ─ Roles ─
     public async Task<IReadOnlyList<RoleDto>> ListRolesAsync(string cluster, string ns, CancellationToken ct = default)
-        => (await _k8s.For(cluster).ListRolesAsync(ns, ct)).Select(MapRole).ToList();
+    {
+        _policy.EnsureNamespaceAllowed(ns);
+        return (await _k8s.For(cluster).ListRolesAsync(ns, ct)).Select(MapRole).ToList();
+    }
 
     public async Task<RoleDto> GetRoleAsync(string cluster, string ns, string name, CancellationToken ct = default)
-        => MapRole(await _k8s.For(cluster).GetRoleAsync(ns, name, ct));
+    {
+        _policy.EnsureNamespaceAllowed(ns);
+        return MapRole(await _k8s.For(cluster).GetRoleAsync(ns, name, ct));
+    }
 
     public async Task<OperationResult> CreateRoleAsync(CreateRoleDto dto, CancellationToken ct = default)
     {
+        _policy.EnsureNamespaceAllowed(dto.Namespace);
         _logger.LogInformation("Creating role {Namespace}/{Name}", dto.Namespace, dto.Name);
         try
         {
@@ -175,6 +183,7 @@ public sealed class RbacManager : IRbacManager
 
     public async Task<OperationResult> DeleteRoleAsync(string cluster, string ns, string name, string requestedBy, string reason, string correlationId, CancellationToken ct = default)
     {
+        _policy.EnsureNamespaceAllowed(ns);
         try
         {
             await _k8s.For(cluster).DeleteRoleAsync(ns, name, ct);
@@ -239,13 +248,20 @@ public sealed class RbacManager : IRbacManager
 
     // ─ RoleBindings ─
     public async Task<IReadOnlyList<RoleBindingDto>> ListRoleBindingsAsync(string cluster, string ns, CancellationToken ct = default)
-        => (await _k8s.For(cluster).ListRoleBindingsAsync(ns, ct)).Select(MapRoleBinding).ToList();
+    {
+        _policy.EnsureNamespaceAllowed(ns);
+        return (await _k8s.For(cluster).ListRoleBindingsAsync(ns, ct)).Select(MapRoleBinding).ToList();
+    }
 
     public async Task<RoleBindingDto> GetRoleBindingAsync(string cluster, string ns, string name, CancellationToken ct = default)
-        => MapRoleBinding(await _k8s.For(cluster).GetRoleBindingAsync(ns, name, ct));
+    {
+        _policy.EnsureNamespaceAllowed(ns);
+        return MapRoleBinding(await _k8s.For(cluster).GetRoleBindingAsync(ns, name, ct));
+    }
 
     public async Task<OperationResult> CreateRoleBindingAsync(CreateRoleBindingDto dto, CancellationToken ct = default)
     {
+        _policy.EnsureNamespaceAllowed(dto.Namespace);
         _logger.LogInformation("Creating rolebinding {Namespace}/{Name}", dto.Namespace, dto.Name);
         try
         {
@@ -268,6 +284,7 @@ public sealed class RbacManager : IRbacManager
 
     public async Task<OperationResult> DeleteRoleBindingAsync(string cluster, string ns, string name, string requestedBy, string reason, string correlationId, CancellationToken ct = default)
     {
+        _policy.EnsureNamespaceAllowed(ns);
         try
         {
             await _k8s.For(cluster).DeleteRoleBindingAsync(ns, name, ct);
