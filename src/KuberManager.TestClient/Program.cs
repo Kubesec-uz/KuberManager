@@ -4,7 +4,7 @@ using KuberManager.Contracts;
 using KuberManager.TestClient;
 
 // ── Config ────────────────────────────────────────────────────────────────────
-var address = Environment.GetEnvironmentVariable("KUBERMANAGER_ADDRESS") ?? "http://localhost:30501";
+var address = Environment.GetEnvironmentVariable("KUBERMANAGER_ADDRESS") ?? "http://127.0.0.1:30501";
 var apiKey  = Environment.GetEnvironmentVariable("KUBERMANAGER_APIKEY")  ?? "change-me";
 var cluster = Environment.GetEnvironmentVariable("KUBERMANAGER_CLUSTER") ?? "default";
 
